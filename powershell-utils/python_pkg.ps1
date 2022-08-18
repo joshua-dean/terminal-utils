@@ -35,12 +35,11 @@ function ApplyNewVersionToVersionFile($NewVersionString) {
 
 function ApplyNewVersionToPyprojectToml($NewVersionString) { 
     # Apply a new version to the pyproject.toml file
-    $PythonPackageName = GetPythonPackageName
-    $PyprojectTomlData = Get-Content -Path $PythonPackageName\pyproject.toml
+    $PyprojectTomlData = Get-Content -Path pyproject.toml
     # There are many versions in this file so we have to match this one specifically
     $TomlPrefix = 'version = "'
     $PyprojectTomlData = $PyprojectTomlData.Replace($TomlPrefix + $VersionRegex, $TomlPrefix + $NewVersionString)
-    Set-Content -Path $PythonPackageName\pyproject.toml -Value $PyprojectTomlData
+    Set-Content -Path pyproject.toml -Value $PyprojectTomlData
 }
 
 function PythonPkgBumpMinor { 
