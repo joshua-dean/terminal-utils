@@ -10,6 +10,12 @@ if __name__ == "__main__":
                     "bump-minor": "PythonPkgBumpMinor",
                     "bump-patch": "PythonPkgBumpPatch",
                 },
+            },
+            { 
+                "script_name": "command_utils.ps1",
+                "aliases": {
+                    "run-command-at-interval": "RunCommandAtInterval",
+                }, 
             }
         ],
         "output": "./test.ps1",
