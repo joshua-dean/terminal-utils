@@ -17,6 +17,12 @@ if __name__ == "__main__":
                 "aliases": {
                     "run-command-at-interval": "RunCommandAtInterval",
                 }, 
+            },
+            {
+                "script_name": "git_utils.ps1",
+                "aliases": {
+                    "git-cleanup": "PostPRCleanup",
+                }
             }
         ],
         "templates": [ 
@@ -30,7 +36,7 @@ if __name__ == "__main__":
                 ]
             }
         ],
-        "output": "./test.ps1",
+        "output": "./demo.ps1",
     }
 
     with open(config["output"], "w") as output_fd:
