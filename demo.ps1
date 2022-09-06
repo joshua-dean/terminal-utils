@@ -75,6 +75,25 @@ function RunCommandAtInterval ($Fn, $IntervalMins) {
 }
 Set-Alias -Name run-command-at-interval -Value RunCommandAtInterval
 
+# Utilities for Git CLI
+
+function PostPRCleanup{
+    # Cleans up local git after a PR or other merge on remote.
+    git checkout master 
+    git pull 
+    $Merged = git branch --merged
+    $Lines = $Merged -Split '\n'
+    foreach($Line in $Lines) { 
+        if ($Line -Match '\*' -or $Line -Match 'master') { 
+            continue 
+        }
+        $Line = $Line -Replace '\s', ''
+        git branch -d $Line
+    }
+    git remote prune origin
+}
+Set-Alias -Name git-cleanup -Value PostPRCleanup
+
     function GetMyEC2InstanceIp {        aws ec2 describe-instances --instance-ids i-0c8f8f8f8f8f8f8f8 --query 'Reservations[0].Instances[0].PublicIpAddress' --output text    }    function StartMyEC2Instance {        aws ec2 start-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function StopMyEC2Instance {        aws ec2 stop-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function SSHMyEC2Instance {        ssh  ec2-user@{GetMyEC2InstanceIp}    }
 Set-Alias -Name get-my-ec2-ip -Value GetMyEC2InstanceIp
 Set-Alias -Name start-my-ec2-instance -Value StartMyEC2Instance
