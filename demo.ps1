@@ -1,3 +1,18 @@
+# Vi bindings
+Set-PSReadLineOption -EditMode Vi
+# Intellisense bindings
+Set-PSReadLineKeyHandler -Chord Shift+Tab -Function ForwardChar
+# Posh-git
+$poshGitModule = Get-Module posh-git -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
+if ($poshGitModule) {
+    $poshGitModule | Import-Module
+}
+elseif (Test-Path -LiteralPath ($modulePath = Join-Path (Split-Path $MyInvocation.MyCommand.Path -Parent) (Join-Path src 'posh-git.psd1'))) {
+    Import-Module $modulePath
+}
+else {
+    throw "Failed to import posh-git."
+}
 # Utilities for python packages in Powershell 
 
 # Globals

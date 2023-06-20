@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     with open(config["output"], "w") as output_fd:
         for module in config["modules"]:
-            cmd_str, command_names = module["str_out"]
+            cmd_str = module["str_out"]
             output_fd.write(cmd_str)
         for command in config["commands"]:
             with open(f"powershell_utils/commands/{command['script_name']}", "r") as script_fd:
