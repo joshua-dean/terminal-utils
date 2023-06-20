@@ -33,6 +33,11 @@ The configuration is a JSON object with the following structure:
             ]
         }
     ],
+    "modules": [
+        {
+            "str_out": python_fn(args),
+        }
+    ]
     "output": "output/path/script_name.ps1"
 }
 ```
@@ -81,3 +86,12 @@ Stop{instance_name}
 SSH{instance_name}
 ```
 To get the IP of, start, stop, and ssh into the instance, respectively.
+
+## Modules
+Modules configure the terminal environment. These generally reference built-in settings or external packages that require setup within the Powershell Profile to work. 
+
+This only writes the profile setup, and does not install any packages.
+
+Current modules:
+- `pwsh_settings.py/set_vi_bindings`: Sets vi bindings for the Powershell terminal.
+- `pwsh_settings.py/set_intellisense_bindings`: Sets intellisense bindings for the Powershell terminal.
