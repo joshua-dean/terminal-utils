@@ -1,3 +1,27 @@
+function RunCommandAtInterval ($Fn, $IntervalMins) {
+    # Run the given function every $IntervalMins minutes.
+    $IntervalSeconds = $IntervalMins * 60;
+    Write-Output "Running command every $IntervalSeconds seconds.";
+    while ($True) {
+        $Fn;
+        Start-Sleep -Seconds $IntervalSeconds;
+    }
+}
+function PostPRCleanup{
+    # Cleans up local git after a PR or other merge on remote.
+    git checkout master 
+    git pull 
+    $Merged = git branch --merged
+    $Lines = $Merged -Split '\n'
+    foreach($Line in $Lines) { 
+        if ($Line -Match '\*' -or $Line -Match 'master') { 
+            continue 
+        }
+        $Line = $Line -Replace '\s', ''
+        git branch -d $Line
+    }
+    git remote prune origin
+}
 function GetVersionRegex () {
     # Get the regex used to match versions
     Return '(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\*|\d+)';
@@ -43,6 +67,25 @@ function PythonPkgBumpMinor {
     $NewVersionString = VersionToString($PythonPackageVersion[0], $PythonPackageVersion[1] + 1, 0)
     ApplyNewVersionToVersionFile($NewVersionString)
     ApplyNewVersionToPyprojectToml($NewVersionString)
+}
+function PythonPkgBumpPatch { 
+    # Bump the patch version of a python package in the current directory
+    $PythonPackageVersion = GetPythonPackageVersion
+
+    $NewVersionString = VersionToString($PythonPackageVersion[0], $PythonPackageVersion[1], $PythonPackageVersion[2] + 1)
+    ApplyNewVersionToVersionFile($NewVersionString)
+    ApplyNewVersionToPyprojectToml($NewVersionString)
+}
+function TagPythonPkgVersion {
+    # Tag the current version of a python package in the current directory
+    param (
+        [string] $Prefix = "v"
+    )
+    $PythonPackageVersion = GetPythonPackageVersion
+    $NewVersionString = VersionToString($PythonPackageVersion[0], $PythonPackageVersion[1], $PythonPackageVersion[2])
+    $NewVersionString = $Prefix + $NewVersionString
+    git tag $NewVersionString
+    git push -u origin
 }
 Set-Alias -Name bump-minor -Value PythonPkgBumpMinor
 Set-Alias -Name bump-patch -Value PythonPkgBumpPatch

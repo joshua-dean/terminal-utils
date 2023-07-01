@@ -90,12 +90,12 @@ def read_all_pwsh_commands_from_file(
     with open(pwsh_file_path, "r") as pwsh_file:
         pwsh_str = pwsh_file.read()
     
-    function_regex = r"^function.*?\{.*?^\}\n"
+    function_regex = r"^function.*?\{.*?^\}"
 
     functions = re.findall(function_regex, pwsh_str, re.MULTILINE | re.DOTALL)
     for function in functions:
         function_name = get_command_name_from_raw_str(function)
-        pwsh_cmds[function_name] = function
+        pwsh_cmds[function_name] = function + "\n"
     
     return pwsh_cmds
 

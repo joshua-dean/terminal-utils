@@ -62,3 +62,15 @@ function PythonPkgBumpPatch {
     ApplyNewVersionToVersionFile($NewVersionString)
     ApplyNewVersionToPyprojectToml($NewVersionString)
 }
+
+function TagPythonPkgVersion {
+    # Tag the current version of a python package in the current directory
+    param (
+        [string] $Prefix = "v"
+    )
+    $PythonPackageVersion = GetPythonPackageVersion
+    $NewVersionString = VersionToString($PythonPackageVersion[0], $PythonPackageVersion[1], $PythonPackageVersion[2])
+    $NewVersionString = $Prefix + $NewVersionString
+    git tag $NewVersionString
+    git push -u origin
+}
