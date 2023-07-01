@@ -36,7 +36,8 @@ The configuration is a JSON object with the following structure:
     "output": "output/path/script_name.ps1"
 }
 ```
-Where `script_name` refers to a script in `powershell_utils`, and `str_out` is a string that will be written to a file.
+Within `aliases`, the key is the alias name (new command), and the value is the command that will be aliased.
+`script_name` refers to a script in `powershell_utils`, and `str_out` is a string that will be written to a file.
 This currently requires the JSON to get written programmatically within `script_builder.py`, so in the future the `templates` section might take on this format:
 ```
 {
