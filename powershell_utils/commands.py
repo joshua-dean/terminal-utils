@@ -8,13 +8,20 @@ def get_command_name_from_raw_str(
 ) -> str: 
     """Get the command name from a raw string."""
     # Remove any leading whitespace and newlines
-    first_line = cmd_str.lstrip.split("\n")[0]
+    first_line = cmd_str.lstrip().split("\n")[0]
     cmd_name_regex = r"function\s+(?P<cmd_name>\w+)\s*[\(\{]"
     cmd_name_match = re.match(cmd_name_regex, first_line)
     if cmd_name_match:
         return cmd_name_match.group("cmd_name")
     else:
         return None
+
+def get_alias_for_command(
+    command_name: str,
+    alias: str
+) -> str:
+    """Get an alias for a command."""
+    return f"Set-Alias -Name {alias} -Value {command_name}\n"
 
 def add_alias_to_command_str(
     command_str: str,
@@ -30,7 +37,7 @@ def add_alias_to_command_str(
     if not command_str.endswith("\n"):
         command_str += "\n"
     
-    alias_str = f"Set-Alias -Name {alias} -Value {command_name}\n"
+    alias_str = get_alias_for_command(command_name, alias)
 
     return f"{command_str}{alias_str}"
 
@@ -83,7 +90,7 @@ def read_all_pwsh_commands_from_file(
     with open(pwsh_file_path, "r") as pwsh_file:
         pwsh_str = pwsh_file.read()
     
-    function_regex = r"^function.*?\{.*?^\}"
+    function_regex = r"^function.*?\{.*?^\}\n"
 
     functions = re.findall(function_regex, pwsh_str, re.MULTILINE | re.DOTALL)
     for function in functions:

@@ -1,4 +1,6 @@
 """Build .ps1 file for use."""
+from pathlib import Path
+from powershell_utils.commands import get_alias_for_command, get_all_pwsh_commands_from_dir, read_all_pwsh_commands_from_file
 from powershell_utils.templates.ec2_ssh import get_ec2_ssh_fns
 from powershell_utils.modules.pwsh_settings import set_vi_bindings, set_intellisense_bindings
 from powershell_utils.modules.external_modules import posh_git
@@ -6,27 +8,16 @@ from powershell_utils.modules.external_modules import posh_git
 if __name__ == "__main__":
     # loosely defined for now
     config = { 
-        "commands": [ 
-            {
-                "script_name": "python_pkg.ps1",
-                "aliases": {
-                    "bump-minor": "PythonPkgBumpMinor",
-                    "bump-patch": "PythonPkgBumpPatch",
-                },
-            },
-            { 
-                "script_name": "command_utils.ps1",
-                "aliases": {
-                    "run-command-at-interval": "RunCommandAtInterval",
-                }, 
-            },
-            {
-                "script_name": "git_utils.ps1",
-                "aliases": {
-                    "git-cleanup": "PostPRCleanup",
-                }
-            }
+        "command_dirs": [
+            "powershell_utils/commands",
         ],
+        "command_files": [],
+        "aliases": {
+            "bump-minor": "PythonPkgBumpMinor",
+            "bump-patch": "PythonPkgBumpPatch",
+            "run-command-at-interval": "RunCommandAtInterval",
+            "git-cleanup": "PostPRCleanup"
+        },
         "templates": [ 
             {
                 "str_out": get_ec2_ssh_fns("MyEC2Instance", "i-0c8f8f8f8f8f8f8f8"),
@@ -55,15 +46,19 @@ if __name__ == "__main__":
     }
 
     with open(config["output"], "w") as output_fd:
+        for command_dir in config["command_dirs"]:
+            commands = get_all_pwsh_commands_from_dir(Path(command_dir))
+            for command_name, command_str in commands.items():
+                output_fd.write(command_str)
+        for command_file in config["command_files"]:
+            commands = read_all_pwsh_commands_from_file(Path(command_file))
+            for command_name, command_str in commands.items():
+                output_fd.write(command_str)
+        for alias, command_name in config["aliases"].items():
+            output_fd.write(get_alias_for_command(command_name, alias))
         for module in config["modules"]:
             cmd_str = module["str_out"]
             output_fd.write(cmd_str)
-        for command in config["commands"]:
-            with open(f"powershell_utils/commands/{command['script_name']}", "r") as script_fd:
-                output_fd.write(script_fd.read())
-                for alias, command in command["aliases"].items():
-                    output_fd.write(f"\nSet-Alias -Name {alias} -Value {command}")
-                output_fd.write("\n\n")
         for template in config["templates"]:
             cmd_str, command_names = template["str_out"]
             output_fd.write(cmd_str)
