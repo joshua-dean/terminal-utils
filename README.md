@@ -9,6 +9,26 @@ Configuration is a JSON object that gets passed to `script_builder.py`.
 
 The configuration builds a powershell script to a specified filename, and this can be used as a Powershell profile script.
 
+## Structure
+Dataclasses are provided based on the count of inputs, commands produced, and non-command outputs.
+| Type | Inputs | Commands | Outputs |
+| --- | --- | --- | --- |
+| `Include` | 0 | 0 | 1 |
+| `Setting` | 1 | 0 | 1 |
+| `Command` | 1 | 1 | 0 |
+| `Template` | `n` | `n` | `n` |
+
+`Include` will merely include static data in the output.
+
+`Setting` will produce a side effect, such as setting a Powershell setting or invoking a function in the output.
+
+`Command` will produce a command that can be invoked in the terminal. The only provided input is an `alias` for the command.
+
+`Template` is the most flexible, allowing for multiple inputs, commands, and outputs. These are used to generate groups of commands (e.g. commands for starting, stopping, and sshing into an EC2 instance given it's name and ID).
+
+
+
+
 ## Configuration
 The configuration is currently very loosely defined and will change in the future.
 The configuration is a JSON object with the following structure:

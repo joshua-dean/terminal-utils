@@ -1,7 +1,10 @@
 # Utilities for python packages in Powershell 
 
 # Globals
-$Global:VersionRegex = '(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\*|\d+)';
+function GetVersionRegex () {
+    # Get the regex used to match versions
+    Return '(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\*|\d+)';
+}
 
 function VersionToString($MajorVer, $MinorVer, $PatchVer) {
     # Convert a version to a string
@@ -18,7 +21,7 @@ function GetPythonPackageVersion {
     # Get the version of a python package in the current directory
     $PythonPackageName = GetPythonPackageName
     $VersionFileData = Get-Content -Path $PythonPackageName\_version.py
-    $RegexMatches = $VersionFileData | Select-String -Pattern $VersionRegex
+    $RegexMatches = $VersionFileData | Select-String -Pattern (GetVersionRegex)
     $MajorVer = [int]$RegexMatches.Matches.Groups[1].Value
     $MinorVer = [int]$RegexMatches.Matches.Groups[2].Value
     $PatchVer = [int]$RegexMatches.Matches.Groups[3].Value
@@ -29,7 +32,7 @@ function ApplyNewVersionToVersionFile($NewVersionString) {
     # Apply a new version to the version file
     $PythonPackageName = GetPythonPackageName
     $VersionFileData = Get-Content -Path $PythonPackageName\_version.py
-    $VersionFileData = $VersionFileData.Replace($VersionRegex, $NewVersionString)
+    $VersionFileData = $VersionFileData.Replace((GetVersionRegex), $NewVersionString)
     Set-Content -Path $PythonPackageName\_version.py -Value $VersionFileData
 }
 
@@ -38,7 +41,7 @@ function ApplyNewVersionToPyprojectToml($NewVersionString) {
     $PyprojectTomlData = Get-Content -Path pyproject.toml
     # There are many versions in this file so we have to match this one specifically
     $TomlPrefix = 'version = "'
-    $PyprojectTomlData = $PyprojectTomlData.Replace($TomlPrefix + $VersionRegex, $TomlPrefix + $NewVersionString)
+    $PyprojectTomlData = $PyprojectTomlData.Replace($TomlPrefix + (GetVersionRegex), $TomlPrefix + $NewVersionString)
     Set-Content -Path pyproject.toml -Value $PyprojectTomlData
 }
 
