@@ -1,3 +1,18 @@
+# Git Tab completion via posh-git
+# https://github.com/dahlbyk/posh-git/blob/70e44dc0c2cdaf10c0cc8eb9ef5a9ca65ab63dcf/profile.example.ps1
+$poshGitModule = Get-Module posh-git -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
+if ($poshGitModule) {
+    $poshGitModule | Import-Module
+}
+elseif (Test-Path -LiteralPath ($modulePath = Join-Path (Split-Path $MyInvocation.MyCommand.Path -Parent) (Join-Path src 'posh-git.psd1'))) {
+    Import-Module $modulePath
+}
+else {
+    throw "Failed to import posh-git."
+}
+# Vi bindings
+Import-Module PSReadLine
+Set-PSReadLineOption -EditMode Vi
 function RunCommandAtInterval ($Fn, $IntervalMins) {
     # Run the given function every $IntervalMins minutes.
     $IntervalSeconds = $IntervalMins * 60;
@@ -87,27 +102,11 @@ function TagPythonPkgVersion {
     git tag $NewVersionString
     git push -u origin
 }
-Set-Alias -Name bump-minor -Value PythonPkgBumpMinor
-Set-Alias -Name bump-patch -Value PythonPkgBumpPatch
-Set-Alias -Name run-command-at-interval -Value RunCommandAtInterval
-Set-Alias -Name git-cleanup -Value PostPRCleanup
-# Vi bindings
-Set-PSReadLineOption -EditMode Vi
-# Intellisense bindings
-Set-PSReadLineKeyHandler -Chord Shift+Tab -Function ForwardChar
-# Posh-git
-$poshGitModule = Get-Module posh-git -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
-if ($poshGitModule) {
-    $poshGitModule | Import-Module
-}
-elseif (Test-Path -LiteralPath ($modulePath = Join-Path (Split-Path $MyInvocation.MyCommand.Path -Parent) (Join-Path src 'posh-git.psd1'))) {
-    Import-Module $modulePath
-}
-else {
-    throw "Failed to import posh-git."
-}
     function GetMyEC2InstanceIp {        aws ec2 describe-instances --instance-ids i-0c8f8f8f8f8f8f8f8 --query 'Reservations[0].Instances[0].PublicIpAddress' --output text    }    function StartMyEC2Instance {        aws ec2 start-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function StopMyEC2Instance {        aws ec2 stop-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function SSHMyEC2Instance {        ssh  ec2-user@{GetMyEC2InstanceIp}    }
 Set-Alias -Name get-my-ec2-ip -Value GetMyEC2InstanceIp
 Set-Alias -Name start-my-ec2-instance -Value StartMyEC2Instance
 Set-Alias -Name stop-my-ec2-instance -Value StopMyEC2Instance
-Set-Alias -Name ssh-my-ec2-instance -Value SSHMyEC2Instance
+Set-Alias -Name ssh-my-ec2-instance -Value SSHMyEC2InstanceSet-Alias -Name bump-minor -Value PythonPkgBumpMinor
+Set-Alias -Name bump-patch -Value PythonPkgBumpPatch
+Set-Alias -Name run-command-at-interval -Value RunCommandAtInterval
+Set-Alias -Name git-cleanup -Value PostPRCleanup
