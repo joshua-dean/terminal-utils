@@ -102,11 +102,17 @@ function TagPythonPkgVersion {
     git tag $NewVersionString
     git push -u origin
 }
-    function GetMyEC2InstanceIp {        aws ec2 describe-instances --instance-ids i-0c8f8f8f8f8f8f8f8 --query 'Reservations[0].Instances[0].PublicIpAddress' --output text    }    function StartMyEC2Instance {        aws ec2 start-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function StopMyEC2Instance {        aws ec2 stop-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function SSHMyEC2Instance {        ssh  ec2-user@{GetMyEC2InstanceIp}    }
-Set-Alias -Name get-my-ec2-ip -Value GetMyEC2InstanceIp
+    function GetMyEC2InstanceIp {        aws ec2 describe-instances --instance-ids i-0c8f8f8f8f8f8f8f8 --query 'Reservations[0].Instances[0].PublicIpAddress' --output text    }    function StartMyEC2Instance {        aws ec2 start-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function StopMyEC2Instance {        aws ec2 stop-instances --instance-ids i-0c8f8f8f8f8f8f8f8    }    function SSHMyEC2Instance {        ssh  ec2-user@{GetMyEC2InstanceIp}    }Set-Alias -Name get-my-ec2-ip -Value GetMyEC2InstanceIp
+
 Set-Alias -Name start-my-ec2-instance -Value StartMyEC2Instance
+
 Set-Alias -Name stop-my-ec2-instance -Value StopMyEC2Instance
-Set-Alias -Name ssh-my-ec2-instance -Value SSHMyEC2InstanceSet-Alias -Name bump-minor -Value PythonPkgBumpMinor
+
+Set-Alias -Name ssh-my-ec2-instance -Value SSHMyEC2Instance
+
+Set-PSReadLineKeyHandler -Chord F2 -Function SwitchPredictionView
+Set-PSReadLineKeyHandler -Chord Shift+Tab -Function ForwardChar
+Set-Alias -Name bump-minor -Value PythonPkgBumpMinor
 Set-Alias -Name bump-patch -Value PythonPkgBumpPatch
 Set-Alias -Name run-command-at-interval -Value RunCommandAtInterval
 Set-Alias -Name git-cleanup -Value PostPRCleanup

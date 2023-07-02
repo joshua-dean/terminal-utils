@@ -3,8 +3,7 @@ from pathlib import Path
 from powershell_utils.commands import get_alias_for_command, get_all_pwsh_commands_from_dir, read_all_pwsh_commands_from_file
 from powershell_utils.includes import get_all_files_in_dir_as_str, get_file_as_str
 from powershell_utils.templates.ec2_ssh import get_ec2_ssh_fns
-from powershell_utils.modules.pwsh_settings import set_vi_bindings, set_intellisense_bindings
-from powershell_utils.modules.external_modules import posh_git
+from powershell_utils.templates.intellisense import set_intellisense_accept, set_intellisense_pred_view
 
 if __name__ == "__main__":
     # loosely defined for now
@@ -32,7 +31,13 @@ if __name__ == "__main__":
                     "stop-my-ec2-instance",
                     "ssh-my-ec2-instance",
                 ]
-            }
+            },
+            {
+                "str_out": set_intellisense_pred_view("F2")
+            },
+            {
+                "str_out": set_intellisense_accept("Shift+Tab")
+            },
         ],
         "output": "./demo.ps1",
     }
@@ -53,10 +58,16 @@ if __name__ == "__main__":
             for command_name, command_str in commands.items():
                 output_fd.write(command_str)
         for template in config["templates"]:
-            cmd_str, command_names = template["str_out"]
+            if "aliases" in template:
+                cmd_str, command_names = template["str_out"]
+                for alias, command_name in zip(template["aliases"], command_names):
+                    cmd_str += get_alias_for_command(command_name, alias) 
+                    cmd_str += "\n"
+            else:
+                cmd_str = template["str_out"]
+                if not cmd_str.endswith("\n"):
+                    cmd_str += "\n"
             output_fd.write(cmd_str)
-            for alias in template["aliases"]:
-                output_fd.write(f"\nSet-Alias -Name {alias} -Value {command_names[template['aliases'].index(alias)]}")
         for alias, command_name in config["aliases"].items():
             output_fd.write(get_alias_for_command(command_name, alias))
     
