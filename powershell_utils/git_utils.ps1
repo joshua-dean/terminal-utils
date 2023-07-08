@@ -2,7 +2,16 @@
 
 function PostPRCleanup{
     # Cleans up local git after a PR or other merge on remote.
-    git checkout master 
+    if (git branch --list 'master') {
+        git checkout master
+    }
+    elseif (git branch --list 'main') {
+        git checkout main
+    }
+    else {
+        Write-Warning 'PostPRCleanup only supports an initial branch of either "master" or "main"'
+        return
+    }
     git pull 
     $Merged = git branch --merged
     $Lines = $Merged -Split '\n'
